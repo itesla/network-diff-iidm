@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, RTE (http://www.rte-france.com)
+ * Copyright (c) 2020-2021, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -30,12 +30,16 @@ public class BranchDiffInfo {
         private final double p;
         private final double q;
         private final double i;
+        private final double currentLimit;
+        private final double vNom;
 
-        TerminalData(boolean connected, double p, double q, double i) {
+        TerminalData(boolean connected, double p, double q, double i, double currentLimit, double vNom) {
             this.connected = connected;
             this.p = p;
             this.q = q;
             this.i = i;
+            this.currentLimit = currentLimit;
+            this.vNom = vNom;
         }
 
         public boolean isConnected() {
@@ -52,6 +56,14 @@ public class BranchDiffInfo {
 
         public double getI() {
             return i;
+        }
+
+        public double getCurrentLimit() {
+            return currentLimit;
+        }
+
+        public double getvNom() {
+            return vNom;
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, RTE (http://www.rte-france.com)
+ * Copyright (c) 2020-2021, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -74,20 +74,21 @@ public class BranchDiffProc implements DiffProc<Branch> {
 
         private void writeJson(JsonGenerator generator, String terminal, BranchDiffInfo.TerminalData terminalData1,
                                BranchDiffInfo.TerminalData terminalData2) throws IOException {
+            double powerLimit = Math.sqrt(3) * terminalData1.getCurrentLimit() * terminalData1.getvNom() / 1000;
             generator.writeBooleanField("branch." + terminal + ".isConnected1", terminalData1.isConnected());
             generator.writeBooleanField("branch." + terminal + ".isConnected2", terminalData2.isConnected());
             generator.writeNumberField("branch." + terminal + ".p1", terminalData1.getP());
             generator.writeNumberField("branch." + terminal + ".p2", terminalData2.getP());
             generator.writeNumberField("branch." + terminal + ".p-delta", Math.abs(terminalData1.getP() - terminalData2.getP()));
-            generator.writeNumberField("branch." + terminal + ".p-delta-percent", Math.abs(terminalData1.getP() - terminalData2.getP()) / Math.abs(terminalData1.getP()) * 100);
+            generator.writeNumberField("branch." + terminal + ".p-delta-percent", Math.abs(terminalData1.getP() - terminalData2.getP()) / Math.abs(powerLimit) * 100);
             generator.writeNumberField("branch." + terminal + ".q1", terminalData1.getQ());
             generator.writeNumberField("branch." + terminal + ".q2", terminalData2.getQ());
             generator.writeNumberField("branch." + terminal + ".q-delta", Math.abs(terminalData1.getQ() - terminalData2.getQ()));
-            generator.writeNumberField("branch." + terminal + ".q-delta-percent", Math.abs(terminalData1.getQ() - terminalData2.getQ()) / Math.abs(terminalData1.getQ()) * 100);
+            generator.writeNumberField("branch." + terminal + ".q-delta-percent", Math.abs(terminalData1.getQ() - terminalData2.getQ()) / Math.abs(powerLimit) * 100);
             generator.writeNumberField("branch." + terminal + ".i1", terminalData1.getI());
             generator.writeNumberField("branch." + terminal + ".i2", terminalData2.getI());
             generator.writeNumberField("branch." + terminal + ".i-delta", Math.abs(terminalData1.getI() - terminalData2.getI()));
-            generator.writeNumberField("branch." + terminal + ".i-delta-percent", Math.abs(terminalData1.getI() - terminalData2.getI()) / Math.abs(terminalData1.getI()) * 100);
+            generator.writeNumberField("branch." + terminal + ".i-delta-percent", Math.abs(terminalData1.getI() - terminalData2.getI()) / Math.abs(terminalData1.getCurrentLimit()) * 100);
         }
 
         private Set<String> getConnectionStatusDelta() {
@@ -118,22 +119,24 @@ public class BranchDiffProc implements DiffProc<Branch> {
         Objects.requireNonNull(branch1);
         Objects.requireNonNull(branch2);
         BranchDiffInfo branchInfo1 = new BranchDiffInfo(branch1.getId(), new HashMap<Branch.Side, BranchDiffInfo.TerminalData>());
-        branchInfo1.setTerminalData(Side.ONE, getTerminalData(branchInfo1, branch1.getTerminal(Side.ONE)));
-        branchInfo1.setTerminalData(Side.TWO, getTerminalData(branchInfo1, branch1.getTerminal(Side.TWO)));
+        branchInfo1.setTerminalData(Side.ONE, getTerminalData(branchInfo1, branch1.getTerminal(Side.ONE), branch1.getCurrentLimits(Side.ONE).getPermanentLimit()));
+        branchInfo1.setTerminalData(Side.TWO, getTerminalData(branchInfo1, branch1.getTerminal(Side.TWO), branch1.getCurrentLimits(Side.TWO).getPermanentLimit()));
         BranchDiffInfo branchInfo2 = new BranchDiffInfo(branch2.getId(), new HashMap<Branch.Side, BranchDiffInfo.TerminalData>());
-        branchInfo2.setTerminalData(Side.ONE, getTerminalData(branchInfo2, branch2.getTerminal(Side.ONE)));
-        branchInfo2.setTerminalData(Side.TWO, getTerminalData(branchInfo2, branch2.getTerminal(Side.TWO)));
+        branchInfo2.setTerminalData(Side.ONE, getTerminalData(branchInfo2, branch2.getTerminal(Side.ONE), branch2.getCurrentLimits(Side.ONE).getPermanentLimit()));
+        branchInfo2.setTerminalData(Side.TWO, getTerminalData(branchInfo2, branch2.getTerminal(Side.TWO), branch2.getCurrentLimits(Side.TWO).getPermanentLimit()));
         Map<Side, Boolean> sideDifferent = new HashMap<Side, Boolean>();
         sideDifferent.put(Side.ONE, !areEquals(branchInfo1.getTerminalData(Side.ONE), branchInfo2.getTerminalData(Side.ONE)));
         sideDifferent.put(Side.TWO, !areEquals(branchInfo1.getTerminalData(Side.TWO), branchInfo2.getTerminalData(Side.TWO)));
         return new BranchDiffResult(branchInfo1, branchInfo2, sideDifferent);
     }
 
-    private BranchDiffInfo.TerminalData getTerminalData(BranchDiffInfo branchDiffInfo, Terminal terminal) {
+    private BranchDiffInfo.TerminalData getTerminalData(BranchDiffInfo branchDiffInfo, Terminal terminal, double currentLimit) {
         return branchDiffInfo.new TerminalData(terminal.isConnected(),
                                                terminal.getP(),
                                                terminal.getQ(),
-                                               terminal.getI());
+                                               terminal.getI(),
+                                               currentLimit,
+                                               terminal.getVoltageLevel().getNominalV());
     }
 
     private boolean areEquals(BranchDiffInfo.TerminalData terminalData1, BranchDiffInfo.TerminalData terminalData2) {

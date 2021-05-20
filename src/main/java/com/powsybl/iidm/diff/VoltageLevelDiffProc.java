@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, RTE (http://www.rte-france.com)
+ * Copyright (c) 2020-2021, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -61,11 +61,11 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
                 generator.writeNumberField("vl.minV1", vlInfo1.getMinV());
                 generator.writeNumberField("vl.minV2", vlInfo2.getMinV());
                 generator.writeNumberField("vl.minV-delta", Math.abs(vlInfo1.getMinV() - vlInfo2.getMinV()));
-                generator.writeNumberField("vl.minV-delta-percent", Math.abs(vlInfo1.getMinV() - vlInfo2.getMinV()) / Math.abs(vlInfo1.getMinV()) * 100);
+                generator.writeNumberField("vl.minV-delta-percent", Math.abs(vlInfo1.getMinV() - vlInfo2.getMinV()) / Math.abs(vlInfo1.getLowVoltageLimit()) * 100);
                 generator.writeNumberField("vl.maxV1", vlInfo1.getMaxV());
                 generator.writeNumberField("vl.maxV2", vlInfo2.getMaxV());
                 generator.writeNumberField("vl.maxV-delta", Math.abs(vlInfo1.getMaxV() - vlInfo2.getMaxV()));
-                generator.writeNumberField("vl.maxV-delta-percent", Math.abs(vlInfo1.getMaxV() - vlInfo2.getMaxV()) / Math.abs(vlInfo1.getMaxV()) * 100);
+                generator.writeNumberField("vl.maxV-delta-percent", Math.abs(vlInfo1.getMaxV() - vlInfo2.getMaxV()) / Math.abs(vlInfo1.getHighVoltageLimit()) * 100);
                 writeSwitchesStatusJson(generator, "vl.switchesStatusV1", vlInfo1);
                 writeSwitchesStatusJson(generator, "vl.switchesStatusV2", vlInfo2);
                 writeSwitchesDeltaJson(generator, "vl.switchesStatus-delta", vlInfo1, vlInfo2);
@@ -105,6 +105,8 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
                 && DoubleMath.fuzzyEquals(minV1, minV2, config.getGenericTreshold())
                 && (noBusesVl1 == noBusesVl2)
                 && (switchesDiff.areEqual());
-        return new VoltageLevelDiffResult(new VoltageLevelDiffInfo(vl1.getId(), noBusesVl1, minV1, maxV1, switchesStatusVl1), new VoltageLevelDiffInfo(vl2.getId(), noBusesVl2, minV2, maxV2, switchesStatusVl2), !isEqual);
+        return new VoltageLevelDiffResult(new VoltageLevelDiffInfo(vl1.getId(), noBusesVl1, minV1, maxV1, switchesStatusVl1, vl1.getLowVoltageLimit(), vl1.getHighVoltageLimit()),
+                                          new VoltageLevelDiffInfo(vl2.getId(), noBusesVl2, minV2, maxV2, switchesStatusVl2, vl2.getLowVoltageLimit(), vl2.getHighVoltageLimit()),
+                                          !isEqual);
     }
 }

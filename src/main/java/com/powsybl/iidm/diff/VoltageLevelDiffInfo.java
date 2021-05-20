@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, RTE (http://www.rte-france.com)
+ * Copyright (c) 2020-2021, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -17,13 +17,18 @@ public class VoltageLevelDiffInfo {
     private final double minV;
     private final double maxV;
     private final Map<String, Boolean> switchesStatus;
+    private final double lowVoltageLimit;
+    private final double highVoltageLimit;
 
-    public VoltageLevelDiffInfo(String vlId, long noBus, double minV, double maxV, Map<String, Boolean> switchesStatus) {
+    public VoltageLevelDiffInfo(String vlId, long noBus, double minV, double maxV, Map<String, Boolean> switchesStatus,
+                                double lowVoltageLimit, double highVoltageLimit) {
         this.vlId = vlId;
         this.noBus = noBus;
         this.minV = minV;
         this.maxV = maxV;
         this.switchesStatus = switchesStatus;
+        this.lowVoltageLimit = lowVoltageLimit;
+        this.highVoltageLimit = highVoltageLimit;
     }
 
     public String getVlId() {
@@ -44,5 +49,13 @@ public class VoltageLevelDiffInfo {
 
     public Map<String, Boolean> getSwitchesStatus() {
         return switchesStatus;
+    }
+
+    public double getLowVoltageLimit() {
+        return lowVoltageLimit;
+    }
+
+    public double getHighVoltageLimit() {
+        return highVoltageLimit;
     }
 }
