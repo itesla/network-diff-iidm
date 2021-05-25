@@ -101,8 +101,8 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
         Map<String, Boolean> switchesStatusVl2 = StreamSupport.stream(vl2.getSwitches().spliterator(), false).collect(Collectors.toMap(Switch::getId, Switch::isOpen));
         MapDifference<String, Boolean> switchesDiff = Maps.difference(switchesStatusVl1, switchesStatusVl2);
 
-        boolean isEqual = DoubleMath.fuzzyEquals(maxV1, maxV2, config.getGenericTreshold())
-                && DoubleMath.fuzzyEquals(minV1, minV2, config.getGenericTreshold())
+        boolean isEqual = DoubleMath.fuzzyEquals(maxV1, maxV2, config.getVoltageThreshold())
+                && DoubleMath.fuzzyEquals(minV1, minV2, config.getVoltageThreshold())
                 && (noBusesVl1 == noBusesVl2)
                 && (switchesDiff.areEqual());
         return new VoltageLevelDiffResult(new VoltageLevelDiffInfo(vl1.getId(), noBusesVl1, minV1, maxV1, switchesStatusVl1, vl1.getLowVoltageLimit(), vl1.getHighVoltageLimit()),

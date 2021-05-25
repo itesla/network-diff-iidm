@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, RTE (http://www.rte-france.com)
+ * Copyright (c) 2020-2021, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -50,8 +50,9 @@ public class NetworkDiffTest {
 
     private DiffConfig config;
 
-    private void checkValues(DiffConfig config, double genericThreshold, boolean filterDifferent) {
-        assertEquals(config.getGenericTreshold(), genericThreshold, 0.0);
+    private void checkValues(DiffConfig config, double genericThreshold, double voltageThreshold, boolean filterDifferent) {
+        assertEquals(config.getGenericThreshold(), genericThreshold, 0.0);
+        assertEquals(config.getVoltageThreshold(), voltageThreshold, 0.0);
         assertEquals(config.isFilterDifferent(), filterDifferent);
     }
 
@@ -123,7 +124,8 @@ public class NetworkDiffTest {
 
     @Test
     public void testDifferencesChangeThreshold() {
-        config.setGenericTreshold(120.0);
+        config.setGenericThreshold(120.0);
+        config.setVoltageThreshold(120.0);
         NetworkDiff ndiff = new NetworkDiff(config);
         NetworkDiffResults ndifr = ndiff.diff(network1, network2);
         assertFalse(ndifr.isDifferent());
@@ -164,13 +166,21 @@ public class NetworkDiffTest {
     }
 
     @Test
+    public void checkNoConfig() {
+        DiffConfig config = DiffConfig.load(platformConfig);
+        checkValues(config, DiffConfig.EPSILON_DEFAULT, DiffConfig.EPSILON_DEFAULT, DiffConfig.FILTER_DIFF_DEFAULT);
+    }
+
+    @Test
     public void checkCompleteConfig() {
         double genericThreshold = 0.5;
+        double voltageThreshold = 0.2;
         MapModuleConfig moduleConfig = platformConfig.createModuleConfig("networks-diff");
         moduleConfig.setStringProperty("generic-threshold", Double.toString(genericThreshold));
+        moduleConfig.setStringProperty("voltage-threshold", Double.toString(voltageThreshold));
         moduleConfig.setStringProperty("filter-diff", Boolean.toString(true));
         DiffConfig config = DiffConfig.load(platformConfig);
-        checkValues(config, genericThreshold, true);
+        checkValues(config, genericThreshold, voltageThreshold, true);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -180,7 +190,7 @@ public class NetworkDiffTest {
         moduleConfig.setStringProperty("generic-threshold", Double.toString(genericThreshold));
         moduleConfig.setStringProperty("filter-diff", Boolean.toString(false));
         DiffConfig config = DiffConfig.load(platformConfig);
-        checkValues(config, genericThreshold, true);
+        checkValues(config, genericThreshold, DiffConfig.EPSILON_DEFAULT, true);
     }
 
     @Test

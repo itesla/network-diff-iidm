@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, RTE (http://www.rte-france.com)
+ * Copyright (c) 2020-2021, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -20,7 +20,9 @@ public class DiffConfig {
     public static final double EPSILON_DEFAULT = 0.0;
     public static final boolean FILTER_DIFF_DEFAULT = true;
 
-    private double genericTreshold;
+    private double genericThreshold;
+
+    private double voltageThreshold;
 
     private boolean filterDifferent;
 
@@ -31,29 +33,44 @@ public class DiffConfig {
     public static DiffConfig load(PlatformConfig platformConfig) {
         Objects.requireNonNull(platformConfig);
         double epsilon = EPSILON_DEFAULT;
+        double voltageEpsilon = EPSILON_DEFAULT;
         boolean filterDiff = FILTER_DIFF_DEFAULT;
         if (platformConfig.moduleExists("networks-diff")) {
             ModuleConfig config = platformConfig.getModuleConfig("networks-diff");
             epsilon = config.getDoubleProperty("generic-threshold", EPSILON_DEFAULT);
+            voltageEpsilon = config.getDoubleProperty("voltage-threshold", EPSILON_DEFAULT);
             filterDiff = config.getBooleanProperty("filter-diff", FILTER_DIFF_DEFAULT);
         }
-        return new DiffConfig(epsilon, filterDiff);
+        return new DiffConfig(epsilon, voltageEpsilon, filterDiff);
     }
 
-    public DiffConfig(double genericTreshold, boolean filterDifferent) {
-        if (genericTreshold < 0) {
-            throw new IllegalArgumentException("Negative values for generic-threshold not permitted");
+    public DiffConfig(double genericThreshold, boolean filterDifferent) {
+        this(genericThreshold, genericThreshold, filterDifferent);
+    }
+
+    public DiffConfig(double genericThreshold, double voltageThreshold, boolean filterDifferent) {
+        if (genericThreshold < 0 || voltageThreshold < 0) {
+            throw new IllegalArgumentException("Negative values for threshold not permitted");
         }
-        this.genericTreshold = genericTreshold;
+        this.genericThreshold = genericThreshold;
+        this.voltageThreshold = voltageThreshold;
         this.filterDifferent = filterDifferent;
     }
 
-    public double getGenericTreshold() {
-        return genericTreshold;
+    public double getGenericThreshold() {
+        return genericThreshold;
     }
 
-    public void setGenericTreshold(double genericTreshold) {
-        this.genericTreshold = genericTreshold;
+    public void setGenericThreshold(double genericThreshold) {
+        this.genericThreshold = genericThreshold;
+    }
+
+    public double getVoltageThreshold() {
+        return voltageThreshold;
+    }
+
+    public void setVoltageThreshold(double voltageThreshold) {
+        this.voltageThreshold = voltageThreshold;
     }
 
     public boolean isFilterDifferent() {
@@ -68,7 +85,8 @@ public class DiffConfig {
     public String toString() {
         return getClass().getSimpleName() + " [" +
                 "filterDifferent=" + filterDifferent +
-                ", genericThreshold=" + genericTreshold +
+                ", genericThreshold=" + genericThreshold +
+                ", voltageThreshold=" + voltageThreshold +
                 "]";
     }
 

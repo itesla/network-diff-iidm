@@ -141,8 +141,8 @@ public class BranchDiffProc implements DiffProc<Branch> {
 
     private boolean areEquals(BranchDiffInfo.TerminalData terminalData1, BranchDiffInfo.TerminalData terminalData2) {
         return terminalData1.isConnected() == terminalData2.isConnected()
-               && DoubleMath.fuzzyEquals(terminalData1.getP(), terminalData2.getP(), config.getGenericTreshold())
-               && DoubleMath.fuzzyEquals(terminalData1.getQ(), terminalData2.getQ(), config.getGenericTreshold())
-               && DoubleMath.fuzzyEquals(terminalData1.getI(), terminalData2.getI(), config.getGenericTreshold());
+               && DoubleMath.fuzzyEquals(terminalData1.getP(), terminalData2.getP(), config.getGenericThreshold())
+               && DoubleMath.fuzzyEquals(terminalData1.getQ(), terminalData2.getQ(), config.getGenericThreshold())
+               && DoubleMath.fuzzyEquals(terminalData1.getI(), terminalData2.getI(), config.getGenericThreshold());
     }
 }
