@@ -74,21 +74,25 @@ public class BranchDiffProc implements DiffProc<Branch> {
 
         private void writeJson(JsonGenerator generator, String terminal, BranchDiffInfo.TerminalData terminalData1,
                                BranchDiffInfo.TerminalData terminalData2) throws IOException {
-            double powerLimit = Math.sqrt(3) * terminalData1.getCurrentLimit() * terminalData1.getvNom() / 1000;
+            double powerLimit = Double.isNaN(terminalData1.getCurrentLimit()) ? Double.NaN
+                                : Math.sqrt(3) * terminalData1.getCurrentLimit() * terminalData1.getvNom() / 1000;
             generator.writeBooleanField("branch." + terminal + ".isConnected1", terminalData1.isConnected());
             generator.writeBooleanField("branch." + terminal + ".isConnected2", terminalData2.isConnected());
             generator.writeNumberField("branch." + terminal + ".p1", terminalData1.getP());
             generator.writeNumberField("branch." + terminal + ".p2", terminalData2.getP());
             generator.writeNumberField("branch." + terminal + ".p-delta", Math.abs(terminalData1.getP() - terminalData2.getP()));
-            generator.writeNumberField("branch." + terminal + ".p-delta-percent", Math.abs(terminalData1.getP() - terminalData2.getP()) / Math.abs(powerLimit) * 100);
+            generator.writeNumberField("branch." + terminal + ".p-delta-percent", Double.isNaN(powerLimit) ? 0
+                                                                                  : Math.abs(terminalData1.getP() - terminalData2.getP()) / Math.abs(powerLimit) * 100);
             generator.writeNumberField("branch." + terminal + ".q1", terminalData1.getQ());
             generator.writeNumberField("branch." + terminal + ".q2", terminalData2.getQ());
             generator.writeNumberField("branch." + terminal + ".q-delta", Math.abs(terminalData1.getQ() - terminalData2.getQ()));
-            generator.writeNumberField("branch." + terminal + ".q-delta-percent", Math.abs(terminalData1.getQ() - terminalData2.getQ()) / Math.abs(powerLimit) * 100);
+            generator.writeNumberField("branch." + terminal + ".q-delta-percent", Double.isNaN(powerLimit) ? 0
+                                                                                  : Math.abs(terminalData1.getQ() - terminalData2.getQ()) / Math.abs(powerLimit) * 100);
             generator.writeNumberField("branch." + terminal + ".i1", terminalData1.getI());
             generator.writeNumberField("branch." + terminal + ".i2", terminalData2.getI());
             generator.writeNumberField("branch." + terminal + ".i-delta", Math.abs(terminalData1.getI() - terminalData2.getI()));
-            generator.writeNumberField("branch." + terminal + ".i-delta-percent", Math.abs(terminalData1.getI() - terminalData2.getI()) / Math.abs(terminalData1.getCurrentLimit()) * 100);
+            generator.writeNumberField("branch." + terminal + ".i-delta-percent", Double.isNaN(terminalData1.getCurrentLimit()) ? 0
+                                                                                  : Math.abs(terminalData1.getI() - terminalData2.getI()) / Math.abs(terminalData1.getCurrentLimit()) * 100);
         }
 
         private Set<String> getConnectionStatusDelta() {
@@ -119,11 +123,15 @@ public class BranchDiffProc implements DiffProc<Branch> {
         Objects.requireNonNull(branch1);
         Objects.requireNonNull(branch2);
         BranchDiffInfo branchInfo1 = new BranchDiffInfo(branch1.getId(), new HashMap<Branch.Side, BranchDiffInfo.TerminalData>());
-        branchInfo1.setTerminalData(Side.ONE, getTerminalData(branchInfo1, branch1.getTerminal(Side.ONE), branch1.getCurrentLimits(Side.ONE).getPermanentLimit()));
-        branchInfo1.setTerminalData(Side.TWO, getTerminalData(branchInfo1, branch1.getTerminal(Side.TWO), branch1.getCurrentLimits(Side.TWO).getPermanentLimit()));
+        branchInfo1.setTerminalData(Side.ONE, getTerminalData(branchInfo1, branch1.getTerminal(Side.ONE),
+                                    branch1.getCurrentLimits(Side.ONE) == null ? Double.NaN : branch1.getCurrentLimits(Side.ONE).getPermanentLimit()));
+        branchInfo1.setTerminalData(Side.TWO, getTerminalData(branchInfo1, branch1.getTerminal(Side.TWO),
+                                    branch1.getCurrentLimits(Side.TWO) == null ? Double.NaN : branch1.getCurrentLimits(Side.TWO).getPermanentLimit()));
         BranchDiffInfo branchInfo2 = new BranchDiffInfo(branch2.getId(), new HashMap<Branch.Side, BranchDiffInfo.TerminalData>());
-        branchInfo2.setTerminalData(Side.ONE, getTerminalData(branchInfo2, branch2.getTerminal(Side.ONE), branch2.getCurrentLimits(Side.ONE).getPermanentLimit()));
-        branchInfo2.setTerminalData(Side.TWO, getTerminalData(branchInfo2, branch2.getTerminal(Side.TWO), branch2.getCurrentLimits(Side.TWO).getPermanentLimit()));
+        branchInfo2.setTerminalData(Side.ONE, getTerminalData(branchInfo2, branch2.getTerminal(Side.ONE),
+                                    branch1.getCurrentLimits(Side.TWO) == null ? Double.NaN : branch2.getCurrentLimits(Side.ONE).getPermanentLimit()));
+        branchInfo2.setTerminalData(Side.TWO, getTerminalData(branchInfo2, branch2.getTerminal(Side.TWO),
+                                    branch2.getCurrentLimits(Side.TWO) == null ? Double.NaN : branch2.getCurrentLimits(Side.TWO).getPermanentLimit()));
         Map<Side, Boolean> sideDifferent = new HashMap<Side, Boolean>();
         sideDifferent.put(Side.ONE, !areEquals(branchInfo1.getTerminalData(Side.ONE), branchInfo2.getTerminalData(Side.ONE)));
         sideDifferent.put(Side.TWO, !areEquals(branchInfo1.getTerminalData(Side.TWO), branchInfo2.getTerminalData(Side.TWO)));
