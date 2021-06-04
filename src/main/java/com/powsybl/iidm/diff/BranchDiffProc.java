@@ -81,17 +81,17 @@ public class BranchDiffProc implements DiffProc<Branch> {
             generator.writeNumberField("branch." + terminal + ".p1", terminalData1.getP());
             generator.writeNumberField("branch." + terminal + ".p2", terminalData2.getP());
             generator.writeNumberField("branch." + terminal + ".p-delta", Math.abs(terminalData1.getP() - terminalData2.getP()));
-            generator.writeNumberField("branch." + terminal + ".p-delta-percent", Double.isNaN(powerLimit) ? 0
+            generator.writeNumberField("branch." + terminal + ".p-delta-percent", Double.isNaN(powerLimit) ? Double.NaN
                                                                                   : Math.abs(terminalData1.getP() - terminalData2.getP()) / Math.abs(powerLimit) * 100);
             generator.writeNumberField("branch." + terminal + ".q1", terminalData1.getQ());
             generator.writeNumberField("branch." + terminal + ".q2", terminalData2.getQ());
             generator.writeNumberField("branch." + terminal + ".q-delta", Math.abs(terminalData1.getQ() - terminalData2.getQ()));
-            generator.writeNumberField("branch." + terminal + ".q-delta-percent", Double.isNaN(powerLimit) ? 0
+            generator.writeNumberField("branch." + terminal + ".q-delta-percent", Double.isNaN(powerLimit) ? Double.NaN
                                                                                   : Math.abs(terminalData1.getQ() - terminalData2.getQ()) / Math.abs(powerLimit) * 100);
             generator.writeNumberField("branch." + terminal + ".i1", terminalData1.getI());
             generator.writeNumberField("branch." + terminal + ".i2", terminalData2.getI());
             generator.writeNumberField("branch." + terminal + ".i-delta", Math.abs(terminalData1.getI() - terminalData2.getI()));
-            generator.writeNumberField("branch." + terminal + ".i-delta-percent", Double.isNaN(terminalData1.getCurrentLimit()) ? 0
+            generator.writeNumberField("branch." + terminal + ".i-delta-percent", Double.isNaN(terminalData1.getCurrentLimit()) ? Double.NaN
                                                                                   : Math.abs(terminalData1.getI() - terminalData2.getI()) / Math.abs(terminalData1.getCurrentLimit()) * 100);
         }
 
