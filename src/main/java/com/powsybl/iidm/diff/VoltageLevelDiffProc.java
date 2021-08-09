@@ -60,12 +60,12 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
                 generator.writeNumberField("vl.noBus2", vlInfo2.getNoBus());
                 generator.writeNumberField("vl.minV1", vlInfo1.getMinV());
                 generator.writeNumberField("vl.minV2", vlInfo2.getMinV());
-                generator.writeNumberField("vl.minV-delta", Math.abs(vlInfo1.getMinV() - vlInfo2.getMinV()));
-                generator.writeNumberField("vl.minV-delta-percent", Math.abs(vlInfo1.getMinV() - vlInfo2.getMinV()) / Math.abs(vlInfo1.getLowVoltageLimit()) * 100);
+                generator.writeNumberField("vl.minV-delta", vlInfo2.getMinV() - vlInfo1.getMinV());
+                generator.writeNumberField("vl.minV-delta-percent", (vlInfo2.getMinV() - vlInfo1.getMinV()) / Math.abs(vlInfo1.getLowVoltageLimit()) * 100);
                 generator.writeNumberField("vl.maxV1", vlInfo1.getMaxV());
                 generator.writeNumberField("vl.maxV2", vlInfo2.getMaxV());
-                generator.writeNumberField("vl.maxV-delta", Math.abs(vlInfo1.getMaxV() - vlInfo2.getMaxV()));
-                generator.writeNumberField("vl.maxV-delta-percent", Math.abs(vlInfo1.getMaxV() - vlInfo2.getMaxV()) / Math.abs(vlInfo1.getHighVoltageLimit()) * 100);
+                generator.writeNumberField("vl.maxV-delta", vlInfo2.getMaxV() - vlInfo1.getMaxV());
+                generator.writeNumberField("vl.maxV-delta-percent", (vlInfo2.getMaxV() - vlInfo1.getMaxV()) / Math.abs(vlInfo1.getHighVoltageLimit()) * 100);
                 writeSwitchesStatusJson(generator, "vl.switchesStatusV1", vlInfo1);
                 writeSwitchesStatusJson(generator, "vl.switchesStatusV2", vlInfo2);
                 writeSwitchesDeltaJson(generator, "vl.switchesStatus-delta", vlInfo1, vlInfo2);
