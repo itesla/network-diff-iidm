@@ -19,9 +19,12 @@ public class VoltageLevelDiffInfo {
     private final Map<String, Boolean> switchesStatus;
     private final double lowVoltageLimit;
     private final double highVoltageLimit;
+    private final Map<String, Double> busbarsVoltage;
+    private final double nominalVoltage;
 
     public VoltageLevelDiffInfo(String vlId, long noBus, double minV, double maxV, Map<String, Boolean> switchesStatus,
-                                double lowVoltageLimit, double highVoltageLimit) {
+                                double lowVoltageLimit, double highVoltageLimit, Map<String, Double> busbarsVoltage,
+                                double nominalVoltage) {
         this.vlId = vlId;
         this.noBus = noBus;
         this.minV = minV;
@@ -29,6 +32,8 @@ public class VoltageLevelDiffInfo {
         this.switchesStatus = switchesStatus;
         this.lowVoltageLimit = lowVoltageLimit;
         this.highVoltageLimit = highVoltageLimit;
+        this.busbarsVoltage = busbarsVoltage;
+        this.nominalVoltage = nominalVoltage;
     }
 
     public String getVlId() {
@@ -57,5 +62,13 @@ public class VoltageLevelDiffInfo {
 
     public double getHighVoltageLimit() {
         return highVoltageLimit;
+    }
+
+    public Map<String, Double> getBusbarsVoltage() {
+        return busbarsVoltage;
+    }
+
+    public double getNominalVoltage() {
+        return nominalVoltage;
     }
 }
