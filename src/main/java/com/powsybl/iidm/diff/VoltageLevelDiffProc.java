@@ -170,11 +170,11 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
 
         Map<String, Double> busbarsVoltageVl1 = TopologyKind.NODE_BREAKER.equals(vl1.getTopologyKind())
                                                 //? vl1.getNodeBreakerView().getBusbarSectionStream().collect(Collectors.toMap(BusbarSection::getId, BusbarSection::getV)) // BusbarSection::getV is not yet implemented in the network store
-                                                ? vl1.getNodeBreakerView().getBusbarSectionStream().collect(Collectors.toMap(BusbarSection::getId, busbar -> busbar.getTerminal().getBusBreakerView().getBus().getV()))
+                                                ? vl1.getNodeBreakerView().getBusbarSectionStream().collect(Collectors.toMap(BusbarSection::getId, busbar -> busbar.getTerminal().getBusView().getBus() != null ? busbar.getTerminal().getBusView().getBus().getV() : Double.NaN))
                                                 : Collections.emptyMap();
         Map<String, Double> busbarsVoltageVl2 = TopologyKind.NODE_BREAKER.equals(vl2.getTopologyKind())
                                                 //? vl2.getNodeBreakerView().getBusbarSectionStream().collect(Collectors.toMap(BusbarSection::getId, BusbarSection::getV)) // BusbarSection::getV is not yet implemented in the network store
-                                                ? vl2.getNodeBreakerView().getBusbarSectionStream().collect(Collectors.toMap(BusbarSection::getId, busbar -> busbar.getTerminal().getBusBreakerView().getBus().getV()))
+                                                ? vl2.getNodeBreakerView().getBusbarSectionStream().collect(Collectors.toMap(BusbarSection::getId, busbar -> busbar.getTerminal().getBusView().getBus() != null ? busbar.getTerminal().getBusView().getBus().getV() : Double.NaN))
                                                 : Collections.emptyMap();
         MapDifference<String, Double> busbarsDiff = Maps.difference(busbarsVoltageVl1, busbarsVoltageVl2, diffEq);
 
